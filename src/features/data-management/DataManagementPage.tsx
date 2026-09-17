@@ -1,3 +1,4 @@
+// features/data-management/DataManagementPage.tsx
 import { useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { downloadAppData, readImportFile } from '../../services/importExport';
@@ -10,14 +11,16 @@ interface DataManagementPageProps {
   onReset: () => void;
 }
 
+type StatusMessage = { text: string; tone: 'success' | 'error' | 'neutral' } | null;
+
 export function DataManagementPage({ data, onImport, onMerge, onReset }: DataManagementPageProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<StatusMessage>(null);
 
   async function handleFile(file: File): Promise<void> {
     const result = await readImportFile(file);
     if (result.error || !result.data) {
-      setMessage(result.error ?? 'Archivo invalido.');
+      setMessage({ text: result.error ?? 'Archivo invalido.', tone: 'error' });
       return;
     }
 
@@ -27,18 +30,18 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
 
     if (replace) {
       onImport(result.data);
-      setMessage('Datos importados correctamente.');
+      setMessage({ text: 'Datos importados correctamente.', tone: 'success' });
       return;
     }
 
     const merge = confirm('Quieres combinar el archivo con tus datos actuales y omitir duplicados por identificacion?');
     if (!merge) {
-      setMessage('Importacion cancelada.');
+      setMessage({ text: 'Importacion cancelada.', tone: 'neutral' });
       return;
     }
 
     onMerge(result.data);
-    setMessage('Datos combinados correctamente.');
+    setMessage({ text: 'Datos combinados correctamente.', tone: 'success' });
   }
 
   function resetAll(): void {
@@ -47,8 +50,14 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
     );
     if (!confirmed) return;
     onReset();
-    setMessage('Datos locales eliminados.');
+    setMessage({ text: 'Datos locales eliminados.', tone: 'neutral' });
   }
+
+  const messageStyles: Record<NonNullable<StatusMessage>['tone'], string> = {
+    success: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    error: 'border-red-200 bg-red-50 text-red-800',
+    neutral: 'border-slate-200 bg-slate-50 text-slate-700',
+  };
 
   return (
     <section className="grid gap-5 md:grid-cols-2">
@@ -57,6 +66,7 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
         <p className="mt-2 text-sm text-slate-600">
           Descarga un archivo JSON con todas tus notas y procesos para conservar una copia local.
         </p>
+        <p className="mt-1 text-sm text-slate-500">Recomendado: exporta una copia con frecuencia, sobre todo antes de borrar datos.</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Button type="button" variant="primary" onClick={() => downloadAppData(data)}>
             Exportar datos
@@ -92,7 +102,11 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
             Borrar datos locales
           </Button>
         </div>
-        {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
+        {message ? (
+          <p className={`mt-3 rounded-md border px-3 py-2 text-sm ${messageStyles[message.tone]}`}>
+            {message.text}
+          </p>
+        ) : null}
       </div>
     </section>
   );

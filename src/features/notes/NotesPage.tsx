@@ -1,3 +1,4 @@
+// features/notes/NotesPage.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Field, TextArea, TextInput } from '../../components/Field';
@@ -19,6 +20,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const editingNote = notes.find((note) => note.id === editingId);
   const filteredNotes = useMemo(() => {
@@ -41,6 +43,18 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (!editingId) return;
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setEditingId(null);
+        setDraft(emptyDraft);
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [editingId]);
 
   function saveNote(): void {
     const title = draft.title.trim();
@@ -81,6 +95,15 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
     onChange(notes.filter((item) => item.id !== note.id));
   }
 
+  function toggleExpanded(id: string): void {
+    setExpandedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   return (
     <section className="grid gap-5 lg:grid-cols-[minmax(280px,360px)_1fr]">
       <form
@@ -93,6 +116,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
         <h2 className="text-lg font-semibold">{editingNote ? 'Editar nota' : 'Nueva nota'}</h2>
         <Field label="Titulo">
           <TextInput
+            placeholder="Sin titulo"
             value={draft.title}
             onChange={(event) => setDraft({ ...draft, title: event.target.value })}
           />
@@ -122,9 +146,20 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
       </form>
 
       <div className="grid min-h-0 content-start gap-3">
-        <Field label="Buscar notas">
-          <TextInput value={query} onChange={(event) => setQuery(event.target.value)} />
-        </Field>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="min-w-[220px] flex-1">
+            <Field label="Buscar notas">
+              <TextInput
+                placeholder="Titulo o contenido"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </Field>
+          </div>
+          <p className="pb-2 text-sm text-slate-500">
+            {filteredNotes.length} {filteredNotes.length === 1 ? 'nota' : 'notas'}
+          </p>
+        </div>
         <div className="min-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/70 p-3 lg:max-h-[calc(100vh-280px)]">
           {visibleNotes.length === 0 ? (
             <div className="grid min-h-72 place-items-center rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
@@ -144,30 +179,53 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
             </div>
           ) : null}
           <div className="grid gap-3">
-            {visibleNotes.map((note) => (
-              <article className="rounded-md border border-slate-200 bg-white p-4" key={note.id}>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <h3 className="break-words font-semibold">{note.title}</h3>
-                    <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-700">
-                      {note.content}
-                    </p>
-                    <p className="mt-3 text-xs text-slate-500">
-                      Creada {formatDateTime(note.createdAt)} - Modificada{' '}
-                      {formatDateTime(note.updatedAt)}
-                    </p>
+            {visibleNotes.map((note) => {
+              const isEditing = note.id === editingId;
+              const isExpanded = expandedIds.has(note.id);
+              const isLong = note.content.length > 220;
+              return (
+                <article
+                  className={`rounded-md border bg-white p-4 transition-colors ${
+                    isEditing ? 'border-slate-900 ring-1 ring-slate-900' : 'border-slate-200'
+                  }`}
+                  key={note.id}
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <h3 className="break-words font-semibold">{note.title}</h3>
+                      <p
+                        className={`mt-1 whitespace-pre-wrap break-words text-sm text-slate-700 ${
+                          isLong && !isExpanded ? 'line-clamp-4' : ''
+                        }`}
+                      >
+                        {note.content}
+                      </p>
+                      {isLong ? (
+                        <button
+                          className="mt-1 text-xs font-medium text-slate-600 hover:underline"
+                          onClick={() => toggleExpanded(note.id)}
+                          type="button"
+                        >
+                          {isExpanded ? 'Ver menos' : 'Ver mas'}
+                        </button>
+                      ) : null}
+                      <p className="mt-3 text-xs text-slate-500">
+                        Creada {formatDateTime(note.createdAt)} - Modificada{' '}
+                        {formatDateTime(note.updatedAt)}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="button" onClick={() => editNote(note)}>
+                        Editar
+                      </Button>
+                      <Button type="button" variant="danger" onClick={() => deleteNote(note)}>
+                        Eliminar
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button type="button" onClick={() => editNote(note)}>
-                      Editar
-                    </Button>
-                    <Button type="button" variant="danger" onClick={() => deleteNote(note)}>
-                      Eliminar
-                    </Button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
         <Pagination
