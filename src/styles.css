@@ -23,3 +23,51 @@ select {
   outline: 3px solid #bae6fd;
   outline-offset: 2px;
 }
+
+.rich-text-content h1 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.rich-text-content h2 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.rich-text-content p {
+  margin: 0.35rem 0;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.rich-text-content ul {
+  list-style: disc;
+}
+
+.rich-text-content ol {
+  list-style: decimal;
+}
+
+.rich-text-content a {
+  color: #0369a1;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rich-text-content blockquote {
+  margin: 0.75rem 0;
+  border-left: 3px solid #bae6fd;
+  padding-left: 0.75rem;
+  color: #475569;
+}

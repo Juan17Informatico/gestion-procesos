@@ -1,10 +1,12 @@
 // features/notes/NotesPage.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
-import { Field, TextArea, TextInput } from '../../components/Field';
+import { Field, TextInput } from '../../components/Field';
 import { Pagination } from '../../components/Pagination';
+import { RichTextEditor } from '../../components/RichTextEditor';
 import type { Note } from '../../types/app';
 import { formatDateTime, nowIso } from '../../utils/dates';
+import { htmlToPlainText, sanitizeRichTextHtml } from '../../utils/html';
 import { createId } from '../../utils/id';
 
 interface NotesPageProps {
@@ -26,7 +28,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   const filteredNotes = useMemo(() => {
     const term = query.trim().toLowerCase();
     return notes
-      .filter((note) => `${note.title} ${note.content}`.toLowerCase().includes(term))
+      .filter((note) => `${note.title} ${htmlToPlainText(note.content)}`.toLowerCase().includes(term))
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }, [notes, query]);
   const totalPages = Math.max(1, Math.ceil(filteredNotes.length / NOTES_PER_PAGE));
@@ -58,7 +60,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
 
   function saveNote(): void {
     const title = draft.title.trim();
-    const content = draft.content.trim();
+    const content = sanitizeRichTextHtml(draft.content).trim();
     if (!title && !content) return;
 
     const now = nowIso();
@@ -121,12 +123,14 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
             onChange={(event) => setDraft({ ...draft, title: event.target.value })}
           />
         </Field>
-        <Field label="Contenido">
-          <TextArea
+        <div className="grid gap-1.5 text-sm font-medium text-slate-700">
+          <span>Contenido</span>
+          <RichTextEditor
             value={draft.content}
-            onChange={(event) => setDraft({ ...draft, content: event.target.value })}
+            onChange={(content) => setDraft({ ...draft, content })}
+            placeholder="Escribe una nota con formato..."
           />
-        </Field>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button type="submit" variant="primary">
             Guardar nota
@@ -182,7 +186,9 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
             {visibleNotes.map((note) => {
               const isEditing = note.id === editingId;
               const isExpanded = expandedIds.has(note.id);
-              const isLong = note.content.length > 220;
+              const noteText = htmlToPlainText(note.content);
+              const safeContent = sanitizeRichTextHtml(note.content);
+              const isLong = noteText.length > 220;
               return (
                 <article
                   className={`rounded-md border bg-white p-4 transition-colors ${
@@ -193,13 +199,12 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <h3 className="break-words font-semibold">{note.title}</h3>
-                      <p
-                        className={`mt-1 whitespace-pre-wrap break-words text-sm text-slate-700 ${
+                      <div
+                        className={`rich-text-content mt-1 break-words text-sm text-slate-700 ${
                           isLong && !isExpanded ? 'line-clamp-4' : ''
                         }`}
-                      >
-                        {note.content}
-                      </p>
+                        dangerouslySetInnerHTML={{ __html: safeContent }}
+                      />
                       {isLong ? (
                         <button
                           className="mt-1 text-xs font-medium text-slate-600 hover:underline"
