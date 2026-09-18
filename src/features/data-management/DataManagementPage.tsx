@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { downloadAppData, readImportFile } from '../../services/importExport';
 import type { AppData } from '../../types/app';
+import { choiceDialog, confirmDialog } from '../../utils/dialogs';
 
 interface DataManagementPageProps {
   data: AppData;
@@ -24,18 +25,34 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
       return;
     }
 
-    const replace = confirm(
-      `Quieres importar estos datos?\n\nActualmente tienes:\n${data.processes.length} procesos\n${data.notes.length} notas\n\nEl archivo contiene:\n${result.data.processes.length} procesos\n${result.data.notes.length} notas\n\nAceptar: reemplazar datos\nCancelar: elegir combinar o cancelar`,
-    );
+    const choice = await choiceDialog({
+      title: 'Importar copia de seguridad',
+      html: `
+        <div class="app-dialog-summary">
+          <div>
+            <strong>Datos actuales</strong>
+            <span>${data.processes.length} procesos</span>
+            <span>${data.notes.length} notas</span>
+          </div>
+          <div>
+            <strong>Archivo seleccionado</strong>
+            <span>${result.data.processes.length} procesos</span>
+            <span>${result.data.notes.length} notas</span>
+          </div>
+        </div>
+      `,
+      confirmText: 'Reemplazar',
+      denyText: 'Combinar',
+      cancelText: 'Cancelar',
+    });
 
-    if (replace) {
+    if (choice === 'confirm') {
       onImport(result.data);
       setMessage({ text: 'Datos importados correctamente.', tone: 'success' });
       return;
     }
 
-    const merge = confirm('Quieres combinar el archivo con tus datos actuales y omitir duplicados por identificacion?');
-    if (!merge) {
+    if (choice === 'cancel') {
       setMessage({ text: 'Importacion cancelada.', tone: 'neutral' });
       return;
     }
@@ -44,10 +61,13 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
     setMessage({ text: 'Datos combinados correctamente.', tone: 'success' });
   }
 
-  function resetAll(): void {
-    const confirmed = confirm(
-      'Esto eliminara todas las notas y procesos guardados en este navegador. Deseas continuar?',
-    );
+  async function resetAll(): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Borrar datos locales',
+      text: 'Esto eliminara todas las notas y procesos guardados en este navegador.',
+      confirmText: 'Borrar datos',
+      danger: true,
+    });
     if (!confirmed) return;
     onReset();
     setMessage({ text: 'Datos locales eliminados.', tone: 'neutral' });
@@ -98,7 +118,7 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
           <Button type="button" variant="primary" onClick={() => inputRef.current?.click()}>
             Importar datos
           </Button>
-          <Button type="button" variant="danger" onClick={resetAll}>
+          <Button type="button" variant="danger" onClick={() => void resetAll()}>
             Borrar datos locales
           </Button>
         </div>

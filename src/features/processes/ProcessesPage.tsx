@@ -5,6 +5,8 @@ import { Field, TextArea, TextInput } from '../../components/Field';
 import { Pagination } from '../../components/Pagination';
 import type { Process, ProcessStatus } from '../../types/app';
 import { formatDateTime, nowIso } from '../../utils/dates';
+import { confirmDialog, contentDialog } from '../../utils/dialogs';
+import { escapeHtml } from '../../utils/html';
 import { createId } from '../../utils/id';
 import { parseProcessesText, type ParsedProcess } from './services/processParser';
 
@@ -158,9 +160,46 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
     onChange(processes.map((process) => (process.id === id ? { ...process, status, updatedAt: nowIso() } : process)));
   }
 
-  function deleteProcess(process: Process): void {
-    if (!confirm(`Eliminar el proceso de ${process.name}?`)) return;
+  async function deleteProcess(process: Process): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Eliminar proceso',
+      text: `El proceso de ${process.name} se eliminara de este navegador.`,
+      confirmText: 'Eliminar',
+      danger: true,
+    });
+    if (!confirmed) return;
     onChange(processes.filter((item) => item.id !== process.id));
+  }
+
+  async function previewProcessNote(process: Process): Promise<void> {
+    const note = process.notes?.trim();
+    if (!note) return;
+
+    await contentDialog({
+      title: `Nota de ${process.name}`,
+      html: `
+        <div class="app-dialog-note app-process-note">
+          ${escapeHtml(note)}
+        </div>
+        <p class="app-dialog-note-meta">
+          Proceso del ${formatProcessDate(process.date)} - Actualizado ${formatDateTime(process.updatedAt)}
+        </p>
+      `,
+    });
+  }
+
+  async function previewProcessName(process: Process): Promise<void> {
+    await contentDialog({
+      title: 'Nombre completo',
+      html: `
+        <div class="app-dialog-note app-process-note">
+          ${escapeHtml(process.name)}
+        </div>
+        <p class="app-dialog-note-meta">
+          CC: ${escapeHtml(process.identification || 'Sin identificacion')} - Proceso del ${formatProcessDate(process.date)}
+        </p>
+      `,
+    });
   }
 
   function copyPhone(id: string, phone: string): void {
@@ -277,11 +316,34 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                     {items.map((process) => {
                       const status = getStatusInfo(process.status);
                       const waHref = process.phone ? whatsappHref(process.phone) : null;
+                      const note = process.notes?.trim();
+                      const hasNote = Boolean(note);
                       return (
                         <article className="grid gap-3 border-b border-slate-100 p-3 last:border-b-0 md:grid-cols-[minmax(0,1fr)_150px_190px_150px] md:items-center" key={process.id}>
                           <div className="min-w-0">
-                            <h4 className="truncate font-semibold text-slate-950">{process.name}</h4>
+                            <div className="flex min-w-0 flex-wrap items-center gap-2">
+                              <button
+                                className="min-w-0 truncate text-left font-semibold text-slate-950 hover:underline"
+                                onClick={() => void previewProcessName(process)}
+                                title={process.name}
+                                type="button"
+                              >
+                                {process.name}
+                              </button>
+                              {hasNote ? (
+                                <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-800">
+                                  Tiene nota
+                                </span>
+                              ) : null}
+                            </div>
                             <p className="text-xs text-slate-500">Actualizado {formatDateTime(process.updatedAt)}</p>
+                            {hasNote ? (
+                              <p className="mt-1 line-clamp-1 text-xs text-slate-600">
+                                Nota: {note}
+                              </p>
+                            ) : (
+                              <p className="mt-1 text-xs text-slate-400">Sin nota registrada</p>
+                            )}
                           </div>
                           <p className="text-sm text-slate-700">
                             CC: {process.identification || <span className="text-slate-400">Falta</span>}
@@ -307,8 +369,13 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                             <select className={`min-h-9 rounded-full border px-3 text-sm font-medium ${status.classes}`} value={process.status} onChange={(event) => updateStatus(process.id, event.target.value as ProcessStatus)}>
                               {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.icon} {option.label}</option>)}
                             </select>
+                            {hasNote ? (
+                              <button className="rounded-md px-2 py-1 text-sm text-violet-700 hover:bg-violet-50" type="button" onClick={() => void previewProcessNote(process)}>
+                                Ver nota
+                              </button>
+                            ) : null}
                             <button className="rounded-md px-2 py-1 text-sm text-slate-600 hover:bg-slate-100" type="button" onClick={() => { setEditingId(process.id); setDraft(process); }}>Editar</button>
-                            <button className="rounded-md px-2 py-1 text-sm text-red-700 hover:bg-red-50" type="button" onClick={() => deleteProcess(process)}>Eliminar</button>
+                            <button className="rounded-md px-2 py-1 text-sm text-red-700 hover:bg-red-50" type="button" onClick={() => void deleteProcess(process)}>Eliminar</button>
                           </div>
                         </article>
                       );

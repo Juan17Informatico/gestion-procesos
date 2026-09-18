@@ -4,6 +4,7 @@ import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef, useState } from 'react';
+import { inputDialog } from '../utils/dialogs';
 import { normalizeNoteContent } from '../utils/html';
 
 interface RichTextEditorProps {
@@ -75,10 +76,16 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
     }
   }, [editor, value]);
 
-  function setLink(): void {
+  async function setLink(): Promise<void> {
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href as string | undefined;
-    const url = window.prompt('URL del enlace', previousUrl ?? 'https://');
+    const url = await inputDialog({
+      title: 'Editar enlace',
+      label: 'URL',
+      value: previousUrl ?? 'https://',
+      placeholder: 'https://ejemplo.com',
+      confirmText: 'Aplicar enlace',
+    });
     if (url === null) return;
     if (!url.trim()) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();

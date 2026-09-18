@@ -6,6 +6,7 @@ import { Pagination } from '../../components/Pagination';
 import { RichTextEditor } from '../../components/RichTextEditor';
 import type { Note } from '../../types/app';
 import { formatDateTime, nowIso } from '../../utils/dates';
+import { confirmDialog, contentDialog } from '../../utils/dialogs';
 import { htmlToPlainText, sanitizeRichTextHtml } from '../../utils/html';
 import { createId } from '../../utils/id';
 
@@ -92,9 +93,29 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
     setDraft({ title: note.title, content: note.content });
   }
 
-  function deleteNote(note: Note): void {
-    if (!confirm(`Eliminar la nota "${note.title}"?`)) return;
+  async function deleteNote(note: Note): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Eliminar nota',
+      text: `La nota "${note.title}" se eliminara de este navegador.`,
+      confirmText: 'Eliminar',
+      danger: true,
+    });
+    if (!confirmed) return;
     onChange(notes.filter((item) => item.id !== note.id));
+  }
+
+  async function previewNote(note: Note): Promise<void> {
+    await contentDialog({
+      title: note.title || 'Nota sin titulo',
+      html: `
+        <div class="rich-text-content note-content app-dialog-note">
+          ${sanitizeRichTextHtml(note.content)}
+        </div>
+        <p class="app-dialog-note-meta">
+          Creada ${formatDateTime(note.createdAt)} - Modificada ${formatDateTime(note.updatedAt)}
+        </p>
+      `,
+    });
   }
 
   function toggleExpanded(id: string): void {
@@ -190,15 +211,22 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
               const safeContent = sanitizeRichTextHtml(note.content);
               const isLong = noteText.length > 220;
               return (
-              <article
-                  className={`rounded-lg border bg-white p-5 transition-colors ${
-                    isEditing ? 'border-slate-900 ring-1 ring-slate-900' : 'border-slate-200'
+                <article
+                  className={`rounded-xl border bg-white p-5 shadow-sm transition-colors ${
+                    isEditing ? 'border-sky-200 bg-sky-50/40 ring-1 ring-sky-100' : 'border-slate-200'
                   }`}
                   key={note.id}
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0 flex-1">
-                      <h3 className="break-words font-semibold">{note.title}</h3>
+                      <div className="flex flex-wrap items-start gap-2">
+                        <h3 className="break-words text-base font-semibold text-slate-950">{note.title}</h3>
+                        {isEditing ? (
+                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800">
+                            Editando
+                          </span>
+                        ) : null}
+                      </div>
                       <div
                         className={`rich-text-content note-content mt-2 max-w-3xl break-words text-[13px] leading-relaxed text-slate-700 ${
                           isLong && !isExpanded ? 'line-clamp-4' : ''
@@ -219,11 +247,14 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                         {formatDateTime(note.updatedAt)}
                       </p>
                     </div>
-                    <div className="flex shrink-0 gap-2">
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <Button type="button" onClick={() => void previewNote(note)}>
+                        Vista rapida
+                      </Button>
                       <Button type="button" onClick={() => editNote(note)}>
                         Editar
                       </Button>
-                      <Button type="button" variant="danger" onClick={() => deleteNote(note)}>
+                      <Button type="button" variant="danger" onClick={() => void deleteNote(note)}>
                         Eliminar
                       </Button>
                     </div>
