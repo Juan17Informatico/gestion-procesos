@@ -107,7 +107,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   }
 
   return (
-    <section className="grid gap-5 lg:grid-cols-[minmax(280px,360px)_1fr]">
+    <section className="grid gap-5 xl:grid-cols-[minmax(360px,480px)_minmax(0,1fr)]">
       <form
         className="grid content-start gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
         onSubmit={(event) => {
@@ -190,17 +190,17 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
               const safeContent = sanitizeRichTextHtml(note.content);
               const isLong = noteText.length > 220;
               return (
-                <article
-                  className={`rounded-md border bg-white p-4 transition-colors ${
+              <article
+                  className={`rounded-lg border bg-white p-5 transition-colors ${
                     isEditing ? 'border-slate-900 ring-1 ring-slate-900' : 'border-slate-200'
                   }`}
                   key={note.id}
                 >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="min-w-0 flex-1">
                       <h3 className="break-words font-semibold">{note.title}</h3>
                       <div
-                        className={`rich-text-content mt-1 break-words text-sm text-slate-700 ${
+                        className={`rich-text-content note-content mt-2 max-w-3xl break-words text-[13px] leading-relaxed text-slate-700 ${
                           isLong && !isExpanded ? 'line-clamp-4' : ''
                         }`}
                         dangerouslySetInnerHTML={{ __html: safeContent }}
@@ -219,7 +219,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                         {formatDateTime(note.updatedAt)}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex shrink-0 gap-2">
                       <Button type="button" onClick={() => editNote(note)}>
                         Editar
                       </Button>

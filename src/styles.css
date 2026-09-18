@@ -24,6 +24,11 @@ select {
   outline-offset: 2px;
 }
 
+.ProseMirror:focus,
+.rich-text-content:focus {
+  outline: none;
+}
+
 .rich-text-content h1 {
   margin: 0.75rem 0 0.5rem;
   font-size: 1.5rem;
@@ -65,9 +70,31 @@ select {
   text-underline-offset: 2px;
 }
 
+.rich-text-content mark {
+  border-radius: 0.25rem;
+  padding: 0.05rem 0.18rem;
+}
+
 .rich-text-content blockquote {
   margin: 0.75rem 0;
   border-left: 3px solid #bae6fd;
   padding-left: 0.75rem;
   color: #475569;
+}
+
+.note-content h1 {
+  font-size: 1.15rem;
+}
+
+.note-content h2 {
+  font-size: 1rem;
+}
+
+.note-content p {
+  margin: 0.25rem 0;
+}
+
+.note-content ul,
+.note-content ol {
+  margin: 0.35rem 0;
 }
