@@ -128,15 +128,18 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   }
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[minmax(360px,480px)_minmax(0,1fr)]">
+    <section className="grid gap-5 xl:grid-cols-[minmax(380px,500px)_minmax(0,1fr)]">
       <form
-        className="grid content-start gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+        className="grid content-start gap-4 rounded-3xl border border-[var(--color-border)] bg-white/95 p-5 shadow-[var(--shadow-card)]"
         onSubmit={(event) => {
           event.preventDefault();
           saveNote();
         }}
       >
-        <h2 className="text-lg font-semibold">{editingNote ? 'Editar nota' : 'Nueva nota'}</h2>
+        <div>
+          <p className="text-sm font-semibold text-[var(--color-primary)]">Bloc enriquecido</p>
+          <h2 className="text-2xl font-bold tracking-tight">{editingNote ? 'Editar nota' : 'Nueva nota'}</h2>
+        </div>
         <Field label="Titulo">
           <TextInput
             placeholder="Sin titulo"
@@ -144,7 +147,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
             onChange={(event) => setDraft({ ...draft, title: event.target.value })}
           />
         </Field>
-        <div className="grid gap-1.5 text-sm font-medium text-slate-700">
+        <div className="grid gap-1.5 text-sm font-semibold text-[var(--color-muted)]">
           <span>Contenido</span>
           <RichTextEditor
             value={draft.content}
@@ -171,8 +174,9 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
       </form>
 
       <div className="grid min-h-0 content-start gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="min-w-[220px] flex-1">
+        <div className="rounded-3xl border border-white/80 bg-[linear-gradient(135deg,#ffffff_0%,#eef2ff_60%,#fff7ed_100%)] p-4 shadow-[var(--shadow-card)]">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="min-w-[220px] flex-1">
             <Field label="Buscar notas">
               <TextInput
                 placeholder="Titulo o contenido"
@@ -180,17 +184,18 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                 onChange={(event) => setQuery(event.target.value)}
               />
             </Field>
+            </div>
+            <p className="pb-2 text-sm font-semibold text-[var(--color-muted)]">
+              {filteredNotes.length} {filteredNotes.length === 1 ? 'nota' : 'notas'}
+            </p>
           </div>
-          <p className="pb-2 text-sm text-slate-500">
-            {filteredNotes.length} {filteredNotes.length === 1 ? 'nota' : 'notas'}
-          </p>
         </div>
-        <div className="min-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/70 p-3 lg:max-h-[calc(100vh-280px)]">
+        <div className="min-h-[420px] overflow-y-auto rounded-3xl border border-[var(--color-border)] bg-white/55 p-3 shadow-inner lg:max-h-[calc(100vh-280px)]">
           {visibleNotes.length === 0 ? (
-            <div className="grid min-h-72 place-items-center rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
+            <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center">
               <div>
-                <h3 className="text-lg font-semibold text-slate-950">No encontramos notas</h3>
-                <p className="mt-2 text-sm text-slate-600">
+                <h3 className="text-lg font-bold text-[var(--color-text)]">No encontramos notas</h3>
+                <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
                   {query.trim()
                     ? `No hay notas que coincidan con: "${query.trim()}".`
                     : 'Aun no hay notas guardadas.'}
@@ -212,17 +217,17 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
               const isLong = noteText.length > 220;
               return (
                 <article
-                  className={`rounded-xl border bg-white p-5 shadow-sm transition-colors ${
-                    isEditing ? 'border-sky-200 bg-sky-50/40 ring-1 ring-sky-100' : 'border-slate-200'
+                  className={`rounded-3xl border bg-white p-5 shadow-[var(--shadow-card)] transition-colors ${
+                    isEditing ? 'border-[var(--color-primary-soft-border)] bg-[var(--color-primary-soft)]' : 'border-white/80'
                   }`}
                   key={note.id}
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-start gap-2">
-                        <h3 className="break-words text-base font-semibold text-slate-950">{note.title}</h3>
+                        <h3 className="break-words text-lg font-bold tracking-tight text-[var(--color-text)]">{note.title}</h3>
                         {isEditing ? (
-                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800">
+                          <span className="rounded-full border border-[var(--color-primary-soft-border)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--color-primary-strong)]">
                             Editando
                           </span>
                         ) : null}
@@ -235,14 +240,14 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                       />
                       {isLong ? (
                         <button
-                          className="mt-1 text-xs font-medium text-slate-600 hover:underline"
+                          className="mt-2 text-xs font-semibold text-[var(--color-primary)] hover:underline"
                           onClick={() => toggleExpanded(note.id)}
                           type="button"
                         >
                           {isExpanded ? 'Ver menos' : 'Ver mas'}
                         </button>
                       ) : null}
-                      <p className="mt-3 text-xs text-slate-500">
+                      <p className="mt-4 text-xs font-medium text-[var(--color-muted)]">
                         Creada {formatDateTime(note.createdAt)} - Modificada{' '}
                         {formatDateTime(note.updatedAt)}
                       </p>

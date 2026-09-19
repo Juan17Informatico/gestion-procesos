@@ -81,9 +81,10 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
 
   return (
     <section className="grid gap-5 md:grid-cols-2">
-      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">Exportar datos</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+        <p className="text-sm font-semibold text-[var(--color-primary)]">Copia de seguridad</p>
+        <h2 className="text-2xl font-bold tracking-tight">Exportar datos</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
           Descarga un archivo JSON con todas tus notas y procesos para conservar una copia local.
         </p>
         <p className="mt-1 text-sm text-slate-500">Recomendado: exporta una copia con frecuencia, sobre todo antes de borrar datos.</p>
@@ -97,9 +98,10 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">Importar datos</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+        <p className="text-sm font-semibold text-[var(--color-primary)]">Restauracion</p>
+        <h2 className="text-2xl font-bold tracking-tight">Importar datos</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
           Selecciona un JSON exportado por esta aplicacion. Antes de reemplazar datos se pedira
           confirmacion.
         </p>
@@ -123,7 +125,7 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
           </Button>
         </div>
         {message ? (
-          <p className={`mt-3 rounded-md border px-3 py-2 text-sm ${messageStyles[message.tone]}`}>
+          <p className={`mt-3 rounded-2xl border px-3 py-2 text-sm font-medium ${messageStyles[message.tone]}`}>
             {message.text}
           </p>
         ) : null}
