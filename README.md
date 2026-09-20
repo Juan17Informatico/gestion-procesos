@@ -1,4 +1,4 @@
-# Procesos claros
+# Gestión de procesos
 
 Aplicacion web local para registrar, consultar y organizar procesos de trabajo que antes se gestionaban en Bloc de notas. Esta pensada para una persona que necesita pegar listas de registros, revisar rapidamente estados, buscar por nombre o identificacion, y conservar copias de seguridad sin depender de servidores externos.
 

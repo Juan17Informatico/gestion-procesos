@@ -3,6 +3,7 @@ import { DataManagementPage } from './features/data-management/DataManagementPag
 import { NotesPage } from './features/notes/NotesPage';
 import { ProcessesPage } from './features/processes/ProcessesPage';
 import { useAppData } from './hooks/useAppData';
+import { useTheme } from './hooks/useTheme';
 import { AppLayout } from './layouts/AppLayout';
 
 type Section = 'notes' | 'processes' | 'data';
@@ -10,6 +11,7 @@ type Section = 'notes' | 'processes' | 'data';
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('processes');
   const { data, setData, replaceData, resetData, storageError } = useAppData();
+  const { themePreference, setThemePreference } = useTheme();
 
   function mergeData(incoming: typeof data): void {
     const existingProcessKeys = new Set(
@@ -31,7 +33,9 @@ function App() {
     <AppLayout
       activeSection={activeSection}
       onSectionChange={(section) => setActiveSection(section as Section)}
+      onThemePreferenceChange={setThemePreference}
       storageError={storageError}
+      themePreference={themePreference}
     >
       <div className={activeSection === 'notes' ? 'block' : 'hidden'}>
         <NotesPage notes={data.notes} onChange={(notes) => setData({ ...data, notes })} />

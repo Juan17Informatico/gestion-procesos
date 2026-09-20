@@ -130,7 +130,7 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
   return (
     <section className="grid gap-5 xl:grid-cols-[minmax(380px,500px)_minmax(0,1fr)]">
       <form
-        className="grid content-start gap-4 rounded-3xl border border-[var(--color-border)] bg-white/95 p-5 shadow-[var(--shadow-card)]"
+        className="grid content-start gap-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] p-5 shadow-[var(--shadow-card)]"
         onSubmit={(event) => {
           event.preventDefault();
           saveNote();
@@ -174,25 +174,25 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
       </form>
 
       <div className="grid min-h-0 content-start gap-3">
-        <div className="rounded-3xl border border-white/80 bg-[linear-gradient(135deg,#ffffff_0%,#eef2ff_60%,#fff7ed_100%)] p-4 shadow-[var(--shadow-card)]">
+        <div className="rounded-3xl border border-[var(--color-card-border)] bg-[var(--color-hero-notes)] p-4 shadow-[var(--shadow-card)]">
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-[220px] flex-1">
-            <Field label="Buscar notas">
-              <TextInput
-                placeholder="Titulo o contenido"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-            </Field>
+              <Field label="Buscar notas">
+                <TextInput
+                  placeholder="Titulo o contenido"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+              </Field>
             </div>
             <p className="pb-2 text-sm font-semibold text-[var(--color-muted)]">
               {filteredNotes.length} {filteredNotes.length === 1 ? 'nota' : 'notas'}
             </p>
           </div>
         </div>
-        <div className="min-h-[420px] overflow-y-auto rounded-3xl border border-[var(--color-border)] bg-white/55 p-3 shadow-inner lg:max-h-[calc(100vh-280px)]">
+        <div className="min-h-[420px] overflow-y-auto rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-inset)] p-3 shadow-inner lg:max-h-[calc(100vh-280px)]">
           {visibleNotes.length === 0 ? (
-            <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center">
+            <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-text)]">No encontramos notas</h3>
                 <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
@@ -217,8 +217,10 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
               const isLong = noteText.length > 220;
               return (
                 <article
-                  className={`rounded-3xl border bg-white p-5 shadow-[var(--shadow-card)] transition-colors ${
-                    isEditing ? 'border-[var(--color-primary-soft-border)] bg-[var(--color-primary-soft)]' : 'border-white/80'
+                  className={`rounded-3xl border p-5 shadow-[var(--shadow-card)] transition-colors ${
+                    isEditing
+                      ? 'border-[var(--color-primary-soft-border)] bg-[var(--color-primary-soft)]'
+                      : 'border-[var(--color-card-border)] bg-[var(--color-surface)]'
                   }`}
                   key={note.id}
                 >
@@ -227,13 +229,13 @@ export function NotesPage({ notes, onChange }: NotesPageProps) {
                       <div className="flex flex-wrap items-start gap-2">
                         <h3 className="break-words text-lg font-bold tracking-tight text-[var(--color-text)]">{note.title}</h3>
                         {isEditing ? (
-                          <span className="rounded-full border border-[var(--color-primary-soft-border)] bg-white px-2 py-0.5 text-xs font-semibold text-[var(--color-primary-strong)]">
+                          <span className="rounded-full border border-[var(--color-primary-soft-border)] bg-[var(--color-surface)] px-2 py-0.5 text-xs font-semibold text-[var(--color-primary-strong)]">
                             Editando
                           </span>
                         ) : null}
                       </div>
                       <div
-                        className={`rich-text-content note-content mt-2 max-w-3xl break-words text-[13px] leading-relaxed text-slate-700 ${
+                        className={`rich-text-content note-content mt-2 max-w-3xl break-words text-[13px] leading-relaxed text-[var(--color-muted-strong)] ${
                           isLong && !isExpanded ? 'line-clamp-4' : ''
                         }`}
                         dangerouslySetInnerHTML={{ __html: safeContent }}

@@ -15,10 +15,30 @@ interface ProcessesPageProps {
 }
 
 const statusOptions: Array<{ value: ProcessStatus; label: string; icon: string; classes: string }> = [
-  { value: 'pending', label: 'Pendiente', icon: 'P', classes: 'bg-[#fff0c7] text-amber-950 border-amber-200' },
-  { value: 'validation_only', label: 'Convalidaciones', icon: 'CV', classes: 'bg-[#dcecff] text-sky-950 border-sky-200' },
-  { value: 'complete', label: 'Completo', icon: 'OK', classes: 'bg-[#cff7e2] text-emerald-950 border-emerald-200' },
-  { value: 'unknown', label: 'Sin estado', icon: '-', classes: 'bg-[#eceff3] text-slate-700 border-slate-200' },
+  {
+    value: 'pending',
+    label: 'Pendiente',
+    icon: 'P',
+    classes: 'border-[var(--color-status-pending-border)] bg-[var(--color-status-pending-bg)] text-[var(--color-status-pending-text)]',
+  },
+  {
+    value: 'validation_only',
+    label: 'Convalidaciones',
+    icon: 'CV',
+    classes: 'border-[var(--color-status-validation-border)] bg-[var(--color-status-validation-bg)] text-[var(--color-status-validation-text)]',
+  },
+  {
+    value: 'complete',
+    label: 'Completo',
+    icon: 'OK',
+    classes: 'border-[var(--color-status-complete-border)] bg-[var(--color-status-complete-bg)] text-[var(--color-status-complete-text)]',
+  },
+  {
+    value: 'unknown',
+    label: 'Sin estado',
+    icon: '-',
+    classes: 'border-[var(--color-status-unknown-border)] bg-[var(--color-status-unknown-bg)] text-[var(--color-status-unknown-text)]',
+  },
 ];
 
 const PROCESSES_PER_PAGE = 10;
@@ -228,7 +248,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
 
   return (
     <section className="grid gap-5">
-      <div className="rounded-3xl border border-white/80 bg-[linear-gradient(135deg,#ffffff_0%,#eef2ff_52%,#effdf6_100%)] p-5 shadow-[var(--shadow-card)]">
+      <div className="rounded-3xl border border-[var(--color-card-border)] bg-[var(--color-hero-process)] p-5 shadow-[var(--shadow-card)]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-[var(--color-primary)]">Herramienta diaria</p>
@@ -251,15 +271,15 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon="T" label="Total" value={stats.total} tone="bg-white" />
-        <StatCard icon="OK" label="Completos" value={stats.complete} tone="bg-[#f0fff7]" />
-        <StatCard icon="CV" label="Convalidaciones" value={stats.validation} tone="bg-[#f3f8ff]" />
-        <StatCard icon="P" label="Pendientes" value={stats.pending} tone="bg-[#fff9e8]" />
+        <StatCard icon="T" label="Total" value={stats.total} tone="bg-[var(--color-surface)]" />
+        <StatCard icon="OK" label="Completos" value={stats.complete} tone="bg-[var(--color-stat-complete)]" />
+        <StatCard icon="CV" label="Convalidaciones" value={stats.validation} tone="bg-[var(--color-stat-validation)]" />
+        <StatCard icon="P" label="Pendientes" value={stats.pending} tone="bg-[var(--color-stat-pending)]" />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
         <form
-          className="grid content-start gap-3 rounded-3xl border border-[var(--color-border)] bg-white/95 p-5 shadow-[var(--shadow-card)]"
+          className="grid content-start gap-3 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] p-5 shadow-[var(--shadow-card)]"
           onSubmit={(event) => {
             event.preventDefault();
             saveProcess();
@@ -283,7 +303,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
           </Field>
           <Field label="Estado">
             <select
-              className="min-h-11 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] px-3 py-2 text-sm text-[var(--color-text)]"
               value={draft.status}
               onChange={(event) => setDraft({ ...draft, status: event.target.value as ProcessStatus })}
             >
@@ -316,7 +336,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
         </form>
 
         <div className="grid min-h-0 min-w-0 content-start gap-4">
-          <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-white/95 p-3 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] p-3 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
             <div className="flex flex-wrap items-center gap-2">
               <FilterButton active={statusFilter === 'all'} onClick={() => setStatusFilter('all')}>
                 Todos
@@ -337,7 +357,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
             </div>
           </div>
 
-          <div className="min-h-[420px] overflow-y-auto rounded-3xl border border-[var(--color-border)] bg-white/55 p-3 shadow-inner lg:max-h-[calc(100vh-360px)]">
+          <div className="min-h-[420px] overflow-y-auto rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-inset)] p-3 shadow-inner lg:max-h-[calc(100vh-360px)]">
             {grouped.length === 0 ? <EmptyProcesses hasActiveFilters={hasActiveFilters} onClear={clearFilters} query={query} /> : null}
 
             <div className="grid gap-4">
@@ -362,14 +382,14 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                       </div>
                     </div>
 
-                    <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)]">
+                    <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)]">
                       {items.map((process) => {
                         const status = getStatusInfo(process.status);
                         const waHref = process.phone ? whatsappHref(process.phone) : null;
                         const note = process.notes?.trim();
                         const hasNote = Boolean(note);
                         return (
-                          <article className="grid gap-3 border-b border-slate-100 p-4 transition-colors last:border-b-0 hover:bg-[var(--color-surface-soft)] md:grid-cols-[minmax(0,1fr)_150px_210px_170px] md:items-center" key={process.id}>
+                          <article className="grid gap-3 border-b border-[var(--color-border-subtle)] p-4 transition-colors last:border-b-0 hover:bg-[var(--color-surface-soft)] md:grid-cols-[minmax(0,1fr)_150px_210px_170px] md:items-center" key={process.id}>
                             <div className="min-w-0">
                               <div className="flex min-w-0 flex-wrap items-center gap-2">
                                 <button
@@ -381,38 +401,38 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                                   {process.name}
                                 </button>
                                 {hasNote ? (
-                                  <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-semibold text-violet-800">
+                                  <span className="rounded-full border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-2 py-0.5 text-xs font-semibold text-[var(--color-accent-text)]">
                                     Tiene nota
                                   </span>
                                 ) : null}
                               </div>
                               <p className="text-xs text-[var(--color-muted)]">Actualizado {formatDateTime(process.updatedAt)}</p>
                               {hasNote ? (
-                                <p className="mt-1 line-clamp-1 text-xs font-medium text-slate-600">Nota: {note}</p>
+                                <p className="mt-1 line-clamp-1 text-xs font-medium text-[var(--color-muted-strong)]">Nota: {note}</p>
                               ) : (
-                                <p className="mt-1 text-xs text-slate-400">Sin nota registrada</p>
+                                <p className="mt-1 text-xs text-[var(--color-subtle)]">Sin nota registrada</p>
                               )}
                             </div>
 
-                            <p className="text-sm font-medium text-slate-700">
-                              CC: {process.identification || <span className="text-slate-400">Falta</span>}
+                            <p className="text-sm font-medium text-[var(--color-muted-strong)]">
+                              CC: {process.identification || <span className="text-[var(--color-subtle)]">Falta</span>}
                             </p>
 
-                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--color-muted-strong)]">
                               {process.phone ? (
                                 <a className="font-semibold hover:underline" href={`tel:${process.phone}`}>
                                   {process.phone}
                                 </a>
                               ) : (
-                                <span className="text-slate-400">Sin telefono</span>
+                                <span className="text-[var(--color-subtle)]">Sin telefono</span>
                               )}
                               {process.phone ? (
-                                <button className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold hover:bg-slate-200" type="button" onClick={() => copyPhone(process.id, process.phone ?? '')}>
+                                <button className="rounded-lg bg-[var(--color-surface-muted)] px-2 py-1 text-xs font-semibold hover:bg-[var(--color-primary-soft)]" type="button" onClick={() => copyPhone(process.id, process.phone ?? '')}>
                                   {copiedId === process.id ? 'Copiado' : 'Copiar'}
                                 </button>
                               ) : null}
                               {waHref ? (
-                                <a className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100" href={waHref} target="_blank" rel="noreferrer">
+                                <a className="rounded-lg bg-[var(--color-success-bg)] px-2 py-1 text-xs font-semibold text-[var(--color-success-text)] hover:bg-[var(--color-complete)]" href={waHref} target="_blank" rel="noreferrer">
                                   WhatsApp
                                 </a>
                               ) : null}
@@ -427,14 +447,14 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                                 ))}
                               </select>
                               {hasNote ? (
-                                <button className="rounded-lg px-2 py-1 text-sm font-semibold text-violet-700 hover:bg-violet-50" type="button" onClick={() => void previewProcessNote(process)}>
+                                <button className="rounded-lg px-2 py-1 text-sm font-semibold text-[var(--color-accent-text)] hover:bg-[var(--color-accent-bg)]" type="button" onClick={() => void previewProcessNote(process)}>
                                   Ver nota
                                 </button>
                               ) : null}
-                              <button className="rounded-lg px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100" type="button" onClick={() => { setEditingId(process.id); setDraft(process); }}>
+                              <button className="rounded-lg px-2 py-1 text-sm font-semibold text-[var(--color-muted)] hover:bg-[var(--color-surface-muted)]" type="button" onClick={() => { setEditingId(process.id); setDraft(process); }}>
                                 Editar
                               </button>
-                              <button className="rounded-lg px-2 py-1 text-sm font-semibold text-red-700 hover:bg-red-50" type="button" onClick={() => void deleteProcess(process)}>
+                              <button className="rounded-lg px-2 py-1 text-sm font-semibold text-[var(--color-error-text)] hover:bg-[var(--color-error-bg)]" type="button" onClick={() => void deleteProcess(process)}>
                                 Eliminar
                               </button>
                             </div>
@@ -461,12 +481,12 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
 
       {showPaste ? (
         <div
-          className="fixed inset-0 z-20 grid place-items-center bg-slate-950/30 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-20 grid place-items-center bg-[var(--color-overlay)] p-4 backdrop-blur-sm"
           onClick={(event) => {
             if (event.target === event.currentTarget) setShowPaste(false);
           }}
         >
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-3xl bg-white p-5 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-3xl bg-[var(--color-surface)] p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold tracking-tight">Pegar procesos</h3>
@@ -502,12 +522,12 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
                     const status = getStatusInfo(item.process.status);
                     const flagged = item.warnings.length > 0 || Boolean(item.duplicateOf);
                     return (
-                      <div className={`grid gap-2 border-b border-slate-100 p-3 last:border-b-0 md:grid-cols-[1fr_120px_130px_160px] ${flagged ? 'bg-amber-50' : ''}`} key={item.process.id}>
+                      <div className={`grid gap-2 border-b border-[var(--color-border-subtle)] p-3 last:border-b-0 md:grid-cols-[1fr_120px_130px_160px] ${flagged ? 'bg-[var(--color-warning-bg)]' : ''}`} key={item.process.id}>
                         <strong>{item.process.name}</strong>
                         <span>{item.process.identification || 'Sin CC'}</span>
                         <span>{item.process.phone || 'Sin tel.'}</span>
                         <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${status.classes}`}>{status.icon} {status.label}</span>
-                        {flagged ? <p className="text-sm text-amber-800 md:col-span-4">Atencion: {[...item.warnings, item.duplicateOf ? 'posible duplicado' : ''].filter(Boolean).join(', ')}</p> : null}
+                        {flagged ? <p className="text-sm text-[var(--color-warning-text)] md:col-span-4">Atencion: {[...item.warnings, item.duplicateOf ? 'posible duplicado' : ''].filter(Boolean).join(', ')}</p> : null}
                       </div>
                     );
                   })}
@@ -526,7 +546,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
 
 function EmptyProcesses({ query, hasActiveFilters, onClear }: { query: string; hasActiveFilters: boolean; onClear: () => void }) {
   return (
-    <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center">
+    <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center">
       <div>
         <h3 className="text-lg font-bold text-[var(--color-text)]">No encontramos procesos</h3>
         <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
@@ -544,9 +564,9 @@ function EmptyProcesses({ query, hasActiveFilters, onClear }: { query: string; h
 
 function StatCard({ icon, label, value, tone }: { icon: string; label: string; value: number; tone: string }) {
   return (
-    <div className={`rounded-3xl border border-white/80 p-4 shadow-[var(--shadow-card)] ${tone}`}>
+    <div className={`rounded-3xl border border-[var(--color-card-border)] p-4 shadow-[var(--shadow-card)] ${tone}`}>
       <p className="flex items-center gap-2 text-sm font-bold text-[var(--color-muted)]">
-        <span className="grid h-7 min-w-7 place-items-center rounded-xl bg-white/80 px-1 text-xs text-[var(--color-primary)] shadow-sm" aria-hidden="true">{icon}</span>
+        <span className="grid h-7 min-w-7 place-items-center rounded-xl bg-[var(--color-surface-glass)] px-1 text-xs text-[var(--color-primary)] shadow-sm" aria-hidden="true">{icon}</span>
         {label}
       </p>
       <p className="mt-2 text-3xl font-bold tracking-tight text-[var(--color-text)]">{value}</p>
@@ -560,7 +580,7 @@ function FilterButton({ active, children, onClick }: { active: boolean; children
       className={`rounded-full border px-3 py-2 text-sm font-semibold transition ${
         active
           ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-[0_8px_18px_rgba(91,124,250,0.18)]'
-          : 'border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
+          : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
       }`}
       type="button"
       onClick={onClick}

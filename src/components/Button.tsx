@@ -10,9 +10,9 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'border border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-[0_10px_24px_rgba(91,124,250,0.22)] hover:bg-[var(--color-primary-strong)] hover:border-[var(--color-primary-strong)]',
   secondary:
-    'border border-[var(--color-border)] bg-white/90 text-[var(--color-text)] shadow-sm hover:border-[var(--color-primary-soft-border)] hover:bg-[var(--color-primary-soft)]',
+    'border border-[var(--color-border)] bg-[var(--color-surface-panel)] text-[var(--color-text)] shadow-sm hover:border-[var(--color-primary-soft-border)] hover:bg-[var(--color-primary-soft)]',
   danger:
-    'border border-red-200 bg-red-50 text-red-700 shadow-sm hover:border-red-300 hover:bg-red-100',
+    'border border-[var(--color-error-border)] bg-[var(--color-error-bg)] text-[var(--color-error-text)] shadow-sm hover:border-[var(--color-danger)] hover:bg-[var(--color-error-hover)]',
 };
 
 export function Button({

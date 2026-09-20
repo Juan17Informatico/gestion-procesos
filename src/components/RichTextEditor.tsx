@@ -48,7 +48,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
     editorProps: {
       attributes: {
         class:
-          'rich-text-content min-h-48 rounded-b-2xl bg-white px-4 py-3 text-sm text-[var(--color-text)] outline-none',
+          'rich-text-content min-h-48 rounded-b-2xl bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text)] outline-none',
         'aria-label': 'Contenido de la nota',
       },
     },
@@ -104,7 +104,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
       className={`min-h-9 rounded-md border px-3 text-sm font-medium transition ${
         active
           ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-[0_8px_18px_rgba(91,124,250,0.16)]'
-          : 'border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
+          : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
       }`}
       disabled={!editor}
       onClick={action}
@@ -116,7 +116,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
   );
 
   return (
-    <div className="relative rounded-2xl border border-[var(--color-border)] bg-white shadow-sm">
+    <div className="relative rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
       <div className="relative flex flex-wrap gap-1.5 border-b border-[var(--color-border)] bg-[var(--color-surface-soft)] p-2.5" ref={toolbarRef}>
         {toolButton('B', Boolean(editor?.isActive('bold')), () => editor?.chain().focus().toggleBold().run())}
         {toolButton('I', Boolean(editor?.isActive('italic')), () => editor?.chain().focus().toggleItalic().run())}
@@ -144,7 +144,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
             className={`min-h-9 rounded-md border px-3 text-sm font-medium transition ${
               editor?.isActive('highlight')
                 ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
-                : 'border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)]'
+                : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)]'
             }`}
             disabled={!editor}
             onClick={() => setIsHighlightOpen((current) => !current)}
@@ -154,13 +154,13 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
             Resaltar
           </button>
           {isHighlightOpen ? (
-            <div className="absolute left-0 top-11 z-30 w-64 rounded-2xl border border-[var(--color-border)] bg-white p-3 shadow-xl">
-              <p className="mb-2 text-xs font-semibold text-slate-500">Color de resaltado</p>
+            <div className="absolute left-0 top-11 z-30 w-64 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-xl">
+              <p className="mb-2 text-xs font-semibold text-[var(--color-muted)]">Color de resaltado</p>
               <div className="grid grid-cols-6 gap-2">
                 {highlightColors.map((color) => (
                   <button
                     aria-label={`Resaltar en ${color.label}`}
-                    className="h-8 w-8 rounded-full border border-slate-300 shadow-sm transition hover:scale-105 focus-visible:outline-sky-300"
+                    className="h-8 w-8 rounded-full border border-[var(--color-border)] shadow-sm transition hover:scale-105"
                     disabled={!editor}
                     key={color.value}
                     onClick={() => applyHighlight(color.value)}
@@ -172,7 +172,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
                 ))}
               </div>
               <button
-                className="mt-3 w-full rounded-md border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className="mt-3 w-full rounded-md border border-[var(--color-border)] px-3 py-2 text-xs font-medium text-[var(--color-muted-strong)] hover:bg-[var(--color-surface-muted)]"
                 disabled={!editor}
                 onClick={() => {
                   editor?.chain().focus().unsetHighlight().run();
@@ -187,7 +187,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
           ) : null}
         </div>
         <button
-          className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-muted)] transition hover:bg-amber-50 hover:text-[var(--color-text)]"
+          className="min-h-9 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-medium text-[var(--color-muted)] transition hover:bg-[var(--color-warning-bg)] hover:text-[var(--color-text)]"
           disabled={!editor}
           onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}
           onMouseDown={(event) => event.preventDefault()}
@@ -197,7 +197,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
         </button>
       </div>
       {editor?.isEmpty ? (
-        <p className="pointer-events-none absolute ml-3 mt-3 text-sm text-slate-400">{placeholder}</p>
+        <p className="pointer-events-none absolute ml-3 mt-3 text-sm text-[var(--color-subtle)]">{placeholder}</p>
       ) : null}
       <EditorContent editor={editor} />
     </div>

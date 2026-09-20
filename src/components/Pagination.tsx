@@ -26,7 +26,7 @@ export function Pagination({
   );
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-white/90 px-4 py-3 text-sm shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] px-4 py-3 text-sm shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between">
       <div className="font-medium text-[var(--color-muted)]">
         {hasActiveSearch ? <span>{totalItems} resultados encontrados. </span> : null}
         <span>
@@ -46,12 +46,12 @@ export function Pagination({
           const previous = pages[index - 1];
           return (
             <span className="contents" key={page}>
-              {previous && page - previous > 1 ? <span className="px-2 text-slate-400">...</span> : null}
+              {previous && page - previous > 1 ? <span className="px-2 text-[var(--color-subtle)]">...</span> : null}
               <button
                 className={`min-h-9 min-w-9 rounded-xl px-3 text-sm font-semibold transition ${
                   page === currentPage
                     ? 'bg-[var(--color-primary)] text-white shadow-[0_8px_18px_rgba(91,124,250,0.2)]'
-                    : 'border border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)]'
+                    : 'border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)]'
                 }`}
                 onClick={() => onPageChange(page)}
                 type="button"

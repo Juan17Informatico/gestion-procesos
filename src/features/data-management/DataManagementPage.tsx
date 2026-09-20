@@ -74,31 +74,31 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
   }
 
   const messageStyles: Record<NonNullable<StatusMessage>['tone'], string> = {
-    success: 'border-emerald-200 bg-emerald-50 text-emerald-900',
-    error: 'border-red-200 bg-red-50 text-red-800',
-    neutral: 'border-slate-200 bg-slate-50 text-slate-700',
+    success: 'border-[var(--color-success-border)] bg-[var(--color-success-bg)] text-[var(--color-success-text)]',
+    error: 'border-[var(--color-error-border)] bg-[var(--color-error-bg)] text-[var(--color-error-text)]',
+    neutral: 'border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-muted-strong)]',
   };
 
   return (
     <section className="grid gap-5 md:grid-cols-2">
-      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+      <div className="rounded-3xl border border-[var(--color-card-border)] bg-[var(--color-surface-panel)] p-5 shadow-[var(--shadow-card)]">
         <p className="text-sm font-semibold text-[var(--color-primary)]">Copia de seguridad</p>
         <h2 className="text-2xl font-bold tracking-tight">Exportar datos</h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
           Descarga un archivo JSON con todas tus notas y procesos para conservar una copia local.
         </p>
-        <p className="mt-1 text-sm text-slate-500">Recomendado: exporta una copia con frecuencia, sobre todo antes de borrar datos.</p>
+        <p className="mt-1 text-sm text-[var(--color-muted)]">Recomendado: exporta una copia con frecuencia, sobre todo antes de borrar datos.</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Button type="button" variant="primary" onClick={() => downloadAppData(data)}>
             Exportar datos
           </Button>
-          <span className="text-sm text-slate-600">
-            {data.notes.length} notas · {data.processes.length} procesos
+          <span className="text-sm text-[var(--color-muted-strong)]">
+            {data.notes.length} notas - {data.processes.length} procesos
           </span>
         </div>
       </div>
 
-      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+      <div className="rounded-3xl border border-[var(--color-card-border)] bg-[var(--color-surface-panel)] p-5 shadow-[var(--shadow-card)]">
         <p className="text-sm font-semibold text-[var(--color-primary)]">Restauracion</p>
         <h2 className="text-2xl font-bold tracking-tight">Importar datos</h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
