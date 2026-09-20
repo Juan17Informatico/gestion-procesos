@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { downloadAppData, readImportFile } from '../../services/importExport';
 import type { AppData } from '../../types/app';
+import { choiceDialog, confirmDialog } from '../../utils/dialogs';
 
 interface DataManagementPageProps {
   data: AppData;
@@ -24,18 +25,34 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
       return;
     }
 
-    const replace = confirm(
-      `Quieres importar estos datos?\n\nActualmente tienes:\n${data.processes.length} procesos\n${data.notes.length} notas\n\nEl archivo contiene:\n${result.data.processes.length} procesos\n${result.data.notes.length} notas\n\nAceptar: reemplazar datos\nCancelar: elegir combinar o cancelar`,
-    );
+    const choice = await choiceDialog({
+      title: 'Importar copia de seguridad',
+      html: `
+        <div class="app-dialog-summary">
+          <div>
+            <strong>Datos actuales</strong>
+            <span>${data.processes.length} procesos</span>
+            <span>${data.notes.length} notas</span>
+          </div>
+          <div>
+            <strong>Archivo seleccionado</strong>
+            <span>${result.data.processes.length} procesos</span>
+            <span>${result.data.notes.length} notas</span>
+          </div>
+        </div>
+      `,
+      confirmText: 'Reemplazar',
+      denyText: 'Combinar',
+      cancelText: 'Cancelar',
+    });
 
-    if (replace) {
+    if (choice === 'confirm') {
       onImport(result.data);
       setMessage({ text: 'Datos importados correctamente.', tone: 'success' });
       return;
     }
 
-    const merge = confirm('Quieres combinar el archivo con tus datos actuales y omitir duplicados por identificacion?');
-    if (!merge) {
+    if (choice === 'cancel') {
       setMessage({ text: 'Importacion cancelada.', tone: 'neutral' });
       return;
     }
@@ -44,10 +61,13 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
     setMessage({ text: 'Datos combinados correctamente.', tone: 'success' });
   }
 
-  function resetAll(): void {
-    const confirmed = confirm(
-      'Esto eliminara todas las notas y procesos guardados en este navegador. Deseas continuar?',
-    );
+  async function resetAll(): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Borrar datos locales',
+      text: 'Esto eliminara todas las notas y procesos guardados en este navegador.',
+      confirmText: 'Borrar datos',
+      danger: true,
+    });
     if (!confirmed) return;
     onReset();
     setMessage({ text: 'Datos locales eliminados.', tone: 'neutral' });
@@ -61,9 +81,10 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
 
   return (
     <section className="grid gap-5 md:grid-cols-2">
-      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">Exportar datos</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+        <p className="text-sm font-semibold text-[var(--color-primary)]">Copia de seguridad</p>
+        <h2 className="text-2xl font-bold tracking-tight">Exportar datos</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
           Descarga un archivo JSON con todas tus notas y procesos para conservar una copia local.
         </p>
         <p className="mt-1 text-sm text-slate-500">Recomendado: exporta una copia con frecuencia, sobre todo antes de borrar datos.</p>
@@ -77,9 +98,10 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">Importar datos</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="rounded-3xl border border-white/80 bg-white/95 p-5 shadow-[var(--shadow-card)]">
+        <p className="text-sm font-semibold text-[var(--color-primary)]">Restauracion</p>
+        <h2 className="text-2xl font-bold tracking-tight">Importar datos</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-muted)]">
           Selecciona un JSON exportado por esta aplicacion. Antes de reemplazar datos se pedira
           confirmacion.
         </p>
@@ -98,12 +120,12 @@ export function DataManagementPage({ data, onImport, onMerge, onReset }: DataMan
           <Button type="button" variant="primary" onClick={() => inputRef.current?.click()}>
             Importar datos
           </Button>
-          <Button type="button" variant="danger" onClick={resetAll}>
+          <Button type="button" variant="danger" onClick={() => void resetAll()}>
             Borrar datos locales
           </Button>
         </div>
         {message ? (
-          <p className={`mt-3 rounded-md border px-3 py-2 text-sm ${messageStyles[message.tone]}`}>
+          <p className={`mt-3 rounded-2xl border px-3 py-2 text-sm font-medium ${messageStyles[message.tone]}`}>
             {message.text}
           </p>
         ) : null}

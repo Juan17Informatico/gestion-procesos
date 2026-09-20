@@ -4,6 +4,7 @@ import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef, useState } from 'react';
+import { inputDialog } from '../utils/dialogs';
 import { normalizeNoteContent } from '../utils/html';
 
 interface RichTextEditorProps {
@@ -47,7 +48,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
     editorProps: {
       attributes: {
         class:
-          'rich-text-content min-h-48 rounded-b-lg bg-white px-3 py-3 text-sm text-slate-900 outline-none',
+          'rich-text-content min-h-48 rounded-b-2xl bg-white px-4 py-3 text-sm text-[var(--color-text)] outline-none',
         'aria-label': 'Contenido de la nota',
       },
     },
@@ -75,10 +76,16 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
     }
   }, [editor, value]);
 
-  function setLink(): void {
+  async function setLink(): Promise<void> {
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href as string | undefined;
-    const url = window.prompt('URL del enlace', previousUrl ?? 'https://');
+    const url = await inputDialog({
+      title: 'Editar enlace',
+      label: 'URL',
+      value: previousUrl ?? 'https://',
+      placeholder: 'https://ejemplo.com',
+      confirmText: 'Aplicar enlace',
+    });
     if (url === null) return;
     if (!url.trim()) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
@@ -96,8 +103,8 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
     <button
       className={`min-h-9 rounded-md border px-3 text-sm font-medium transition ${
         active
-          ? 'border-slate-900 bg-slate-900 text-white'
-          : 'border-slate-200 bg-white text-slate-700 hover:bg-rose-50'
+          ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-[0_8px_18px_rgba(91,124,250,0.16)]'
+          : 'border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
       }`}
       disabled={!editor}
       onClick={action}
@@ -109,8 +116,8 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
   );
 
   return (
-    <div className="relative rounded-lg border border-slate-300 bg-white">
-      <div className="relative flex flex-wrap gap-1 border-b border-slate-200 bg-slate-50 p-2" ref={toolbarRef}>
+    <div className="relative rounded-2xl border border-[var(--color-border)] bg-white shadow-sm">
+      <div className="relative flex flex-wrap gap-1.5 border-b border-[var(--color-border)] bg-[var(--color-surface-soft)] p-2.5" ref={toolbarRef}>
         {toolButton('B', Boolean(editor?.isActive('bold')), () => editor?.chain().focus().toggleBold().run())}
         {toolButton('I', Boolean(editor?.isActive('italic')), () => editor?.chain().focus().toggleItalic().run())}
         {toolButton('U', Boolean(editor?.isActive('underline')), () =>
@@ -136,8 +143,8 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
           <button
             className={`min-h-9 rounded-md border px-3 text-sm font-medium transition ${
               editor?.isActive('highlight')
-                ? 'border-slate-900 bg-slate-900 text-white'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-rose-50'
+                ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white'
+                : 'border-[var(--color-border)] bg-white text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)]'
             }`}
             disabled={!editor}
             onClick={() => setIsHighlightOpen((current) => !current)}
@@ -147,7 +154,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
             Resaltar
           </button>
           {isHighlightOpen ? (
-            <div className="absolute left-0 top-11 z-30 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+            <div className="absolute left-0 top-11 z-30 w-64 rounded-2xl border border-[var(--color-border)] bg-white p-3 shadow-xl">
               <p className="mb-2 text-xs font-semibold text-slate-500">Color de resaltado</p>
               <div className="grid grid-cols-6 gap-2">
                 {highlightColors.map((color) => (
@@ -180,7 +187,7 @@ export function RichTextEditor({ value, onChange, placeholder = 'Escribe una not
           ) : null}
         </div>
         <button
-          className="min-h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-amber-50"
+          className="min-h-9 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-muted)] transition hover:bg-amber-50 hover:text-[var(--color-text)]"
           disabled={!editor}
           onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}
           onMouseDown={(event) => event.preventDefault()}
