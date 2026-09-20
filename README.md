@@ -236,8 +236,19 @@ Actualmente soporta:
   - `* - *` -> `complete`
   - `-_-` o `- _-` -> `validation_only`
   - `-` -> `pending`
+- Palabras o abreviaturas de estado al final de la linea:
+  - `ok`, `completo` o `completos` -> `complete`
+  - `cv`, `convalidacion` o `convalidaciones` -> `validation_only`
+  - `p`, `pendiente` o `pendientes` -> `pending`
 - Identificaciones numericas de 6 a 12 digitos.
 - Telefonos colombianos simples que empiezan por `3` y tienen 10 digitos.
+
+Casos de uso admitidos:
+
+- `PERSONA COMPLETA  1000000000  3000000000 ok`
+- `PERSONA EN VALIDACION  1000000001  3000000001 cv`
+- `PERSONA PENDIENTE  1000000002  3000000002 pendientes`
+- `PERSONA CON SIMBOLO  1000000003  3000000003 * - *`
 
 Flujo de pegado:
 
@@ -356,12 +367,14 @@ Herramientas actuales:
 
 - **TypeScript**: valida tipos durante `npm run build`.
 - **Vite build**: genera el bundle de produccion.
+- **Vitest**: cubre casos de parseo para los datos pegados.
 
-No hay configuracion actual de ESLint, formatter automatico ni tests automatizados.
+No hay configuracion actual de ESLint ni formatter automatico.
 
 Comando de validacion usado actualmente:
 
 ```bash
+npm test
 npm run build
 ```
 
@@ -385,7 +398,7 @@ npm run build
 - El parser de datos pegados esta orientado a formatos simples y puede fallar con entradas extremadamente irregulares.
 - No existe importacion CSV formal.
 - No hay historial de cambios por registro.
-- No hay tests automatizados.
+- La cobertura de tests esta enfocada en el parser de procesos; no cubre todavia todos los flujos de UI.
 - No hay modo PWA/offline instalable configurado; la app es frontend-only y puede funcionar localmente una vez servida/cargada, pero no tiene service worker.
 
 ## Posibles mejoras futuras

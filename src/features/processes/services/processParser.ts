@@ -16,6 +16,12 @@ const statusSymbols: Array<{ symbol: string; status: ProcessStatus }> = [
   { symbol: '-', status: 'pending' },
 ];
 
+const statusWords: Array<{ aliases: string[]; status: ProcessStatus }> = [
+  { aliases: ['ok', 'completo', 'completos'], status: 'complete' },
+  { aliases: ['cv', 'convalidacion', 'convalidaciones'], status: 'validation_only' },
+  { aliases: ['p', 'pendiente', 'pendientes'], status: 'pending' },
+];
+
 function toIsoDate(value: string): string | null {
   const match = value.trim().match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
   if (!match) return null;
@@ -24,15 +30,39 @@ function toIsoDate(value: string): string | null {
   return `${match[3]}-${month}-${day}`;
 }
 
+function normalizeStatusWord(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function removeTrailingSeparators(value: string): string {
+  return value.replace(/[\s,;:/|_-]+$/g, '').trim();
+}
+
 function readStatus(line: string): { status: ProcessStatus; symbol?: string; cleaned: string } {
   const normalized = line.replace(/\s+/g, ' ').trim();
   const found = statusSymbols.find((item) => normalized.endsWith(item.symbol));
-  if (!found) return { status: 'unknown', cleaned: line.trim() };
+  if (found) {
+    return {
+      status: found.status,
+      symbol: found.symbol,
+      cleaned: normalized.slice(0, -found.symbol.length).trim(),
+    };
+  }
+
+  const wordMatch = normalized.match(/(?:^|[\s,;:/|_-]+)([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)\.?$/);
+  if (!wordMatch) return { status: 'unknown', cleaned: normalized };
+
+  const marker = normalizeStatusWord(wordMatch[1]);
+  const wordStatus = statusWords.find((item) => item.aliases.includes(marker));
+  if (!wordStatus) return { status: 'unknown', cleaned: normalized };
 
   return {
-    status: found.status,
-    symbol: found.symbol,
-    cleaned: normalized.slice(0, -found.symbol.length).trim(),
+    status: wordStatus.status,
+    symbol: wordMatch[1],
+    cleaned: removeTrailingSeparators(normalized.slice(0, wordMatch.index).trim()),
   };
 }
 
@@ -64,6 +94,8 @@ export function parseProcessesText(input: string, existing: Process[]): ParsedPr
 
     const warnings: string[] = [];
     const statusResult = readStatus(line);
+    if (!statusResult.cleaned) continue;
+
     const tokens = statusResult.cleaned.split(/\t+|\s{2,}/).map((token) => token.trim()).filter(Boolean);
     const fallbackTokens = statusResult.cleaned.split(/\s+/).filter(Boolean);
     const numericTokens = fallbackTokens.filter((token) => /^\d{6,}$/.test(token));

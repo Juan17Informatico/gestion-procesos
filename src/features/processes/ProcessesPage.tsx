@@ -491,7 +491,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
               <div>
                 <h3 className="text-xl font-bold tracking-tight">Pegar procesos</h3>
                 <p className="mt-1 text-sm font-medium text-[var(--color-muted)]">
-                  Acepta fechas, tabulaciones, espacios multiples y simbolos como * - *, -_- o -.
+                  Acepta fechas, tabulaciones, espacios multiples, simbolos (* - *, -_-, -) y estados (ok, completos, cv, convalidaciones, p, pendientes).
                 </p>
               </div>
               <Button type="button" onClick={() => setShowPaste(false)}>
@@ -502,7 +502,7 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
               className="mt-4 min-h-52 w-full rounded-2xl border border-[var(--color-border)] p-3 text-sm"
               value={pasteText}
               onChange={(event) => setPasteText(event.target.value)}
-              placeholder={'14/9/2026\nPERSONA DE EJEMPLO  1000000000  3000000000 -'}
+              placeholder={'14/9/2026\nPERSONA DE EJEMPLO  1000000000  3000000000 ok\nOTRA PERSONA  1000000001  3000000001 cv\nTERCERA PERSONA  1000000002  3000000002 p'}
             />
             <div className="mt-3 flex flex-wrap gap-2">
               <Button type="button" variant="primary" onClick={reviewPaste}>
