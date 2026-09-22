@@ -39,7 +39,7 @@ const statusOptions: Array<{ value: ProcessStatus; label: string; icon: string; 
     value: NO_APTO_PROCESS_STATUS,
     label: NO_APTO_PROCESS_STATUS,
     icon: '',
-    classes: 'border-[#efb8cf] bg-[#fff4f8] text-[#8f0d43] dark:border-[#c7487d] dark:bg-[#4f102b] dark:text-[#ffc2d8]',
+    classes: 'border-[var(--color-status-no-apto-border)] bg-[var(--color-status-no-apto-bg)] text-[var(--color-status-no-apto-text)]',
   },
   {
     value: 'unknown',
@@ -324,9 +324,9 @@ export function ProcessesPage({ processes, onChange }: ProcessesPageProps) {
           icon="OK"
           label="COMPLETO - NO APTO"
           value={stats.noApto}
-          tone="border-[#efb8cf] bg-[#fff0f6] dark:border-[#5f1736] dark:bg-[#3b0d22]"
-          iconTone="bg-[#fde1ed] text-[#a60045] dark:bg-[#4f102b] dark:text-[#ffc2d8]"
-          valueTone="text-[#a60045] dark:text-[#ffc2d8]"
+          tone="border-[var(--color-status-no-apto-border)] bg-[var(--color-stat-no-apto)]"
+          iconTone="bg-[var(--color-stat-no-apto-icon-bg)] text-[var(--color-stat-no-apto-icon-text)]"
+          valueTone="text-[var(--color-stat-no-apto-value)]"
         />
         <StatCard icon="CV" label="Convalidaciones" value={stats.validation} tone="bg-[var(--color-stat-validation)]" />
         <StatCard icon="P" label="Pendientes" value={stats.pending} tone="bg-[var(--color-stat-pending)]" />
