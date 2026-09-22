@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DataManagementPage } from './features/data-management/DataManagementPage';
 import { NotesPage } from './features/notes/NotesPage';
 import { ProcessesPage } from './features/processes/ProcessesPage';
 import { useAppData } from './hooks/useAppData';
 import { useTheme } from './hooks/useTheme';
 import { AppLayout } from './layouts/AppLayout';
+import { getProcessesOlderThanMonths } from './utils/dateRanges';
 
 type Section = 'notes' | 'processes' | 'data';
 
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('processes');
-  const { data, setData, replaceData, resetData, storageError } = useAppData();
+  const { data, setData, replaceData, storageError } = useAppData();
   const { themePreference, setThemePreference } = useTheme();
+  const oldProcessesWarningCount = useMemo(
+    () => getProcessesOlderThanMonths(data.processes, 3).length,
+    [data.processes],
+  );
 
   function mergeData(incoming: typeof data): void {
     const existingProcessKeys = new Set(
@@ -34,6 +39,7 @@ function App() {
       activeSection={activeSection}
       onSectionChange={(section) => setActiveSection(section as Section)}
       onThemePreferenceChange={setThemePreference}
+      oldProcessesWarningCount={oldProcessesWarningCount}
       storageError={storageError}
       themePreference={themePreference}
     >
@@ -47,7 +53,12 @@ function App() {
         />
       </div>
       <div className={activeSection === 'data' ? 'block' : 'hidden'}>
-        <DataManagementPage data={data} onImport={replaceData} onMerge={mergeData} onReset={resetData} />
+        <DataManagementPage
+          data={data}
+          onDataChange={setData}
+          onImport={replaceData}
+          onMerge={mergeData}
+        />
       </div>
     </AppLayout>
   );

@@ -1,4 +1,10 @@
-export type ProcessStatus = 'complete' | 'validation_only' | 'pending' | 'unknown';
+export const NO_APTO_PROCESS_STATUS = 'COMPLETO - NO APTO' as const;
+
+export type ProcessStatus = 'complete' | 'validation_only' | 'pending' | typeof NO_APTO_PROCESS_STATUS | 'unknown';
+
+export function isCompleteProcessStatus(status: ProcessStatus): boolean {
+  return status === 'complete' || status === NO_APTO_PROCESS_STATUS;
+}
 
 export interface Note {
   id: string;

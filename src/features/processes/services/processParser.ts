@@ -1,4 +1,4 @@
-import type { Process, ProcessStatus } from '../../../types/app';
+import { NO_APTO_PROCESS_STATUS, type Process, type ProcessStatus } from '../../../types/app';
 import { nowIso } from '../../../utils/dates';
 import { createId } from '../../../utils/id';
 
@@ -15,6 +15,8 @@ const statusSymbols: Array<{ symbol: string; status: ProcessStatus }> = [
   { symbol: '- _-', status: 'validation_only' },
   { symbol: '-', status: 'pending' },
 ];
+
+const noAptoStatus: ProcessStatus = NO_APTO_PROCESS_STATUS;
 
 const statusWords: Array<{ aliases: string[]; status: ProcessStatus }> = [
   { aliases: ['ok', 'completo', 'completos'], status: 'complete' },
@@ -43,6 +45,16 @@ function removeTrailingSeparators(value: string): string {
 
 function readStatus(line: string): { status: ProcessStatus; symbol?: string; cleaned: string } {
   const normalized = line.replace(/\s+/g, ' ').trim();
+  const noAptoMatch = normalized.match(/(?:^|[\s,;:/|]+)((?:OK\s+)?completo\s*-\s*NO\s+APTO)\.?$/i);
+  if (noAptoMatch) {
+    const markerStart = noAptoMatch.index ?? 0;
+    return {
+      status: noAptoStatus,
+      symbol: noAptoMatch[1],
+      cleaned: removeTrailingSeparators(normalized.slice(0, markerStart).trim()),
+    };
+  }
+
   const found = statusSymbols.find((item) => normalized.endsWith(item.symbol));
   if (found) {
     return {
@@ -141,5 +153,6 @@ export function statusToSymbol(status: ProcessStatus): string {
   if (status === 'complete') return '* - *';
   if (status === 'validation_only') return '-_-';
   if (status === 'pending') return '-';
+  if (status === noAptoStatus) return noAptoStatus;
   return '';
 }

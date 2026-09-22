@@ -1,4 +1,4 @@
-import type { AppData, ImportResult, Note, Process, ProcessStatus } from '../../types/app';
+import { NO_APTO_PROCESS_STATUS, type AppData, type ImportResult, type Note, type Process, type ProcessStatus } from '../../types/app';
 
 const STORAGE_KEY = 'procesos-notas-app-data';
 const CURRENT_VERSION = 1;
@@ -24,14 +24,21 @@ function isNote(value: unknown): value is Note {
   );
 }
 
+function normalizeProcessStatus(value: unknown): ProcessStatus | null {
+  const statuses: ProcessStatus[] = ['complete', 'validation_only', 'pending', NO_APTO_PROCESS_STATUS, 'unknown'];
+  if (statuses.includes(value as ProcessStatus)) return value as ProcessStatus;
+  if (value === 'OK completo - NO APTO') return NO_APTO_PROCESS_STATUS;
+  if (value === 'Completo - NO APTO') return NO_APTO_PROCESS_STATUS;
+  return null;
+}
+
 function isProcess(value: unknown): value is Process {
   if (!isRecord(value)) return false;
-  const statuses: ProcessStatus[] = ['complete', 'validation_only', 'pending', 'unknown'];
   return (
     typeof value.id === 'string' &&
     typeof value.date === 'string' &&
     typeof value.name === 'string' &&
-    statuses.includes(value.status as ProcessStatus) &&
+    normalizeProcessStatus(value.status) === value.status &&
     typeof value.createdAt === 'string' &&
     typeof value.updatedAt === 'string'
   );
@@ -40,6 +47,27 @@ function isProcess(value: unknown): value is Process {
 function migrateLegacyProcess(value: unknown): Process | null {
   if (!isRecord(value) || typeof value.id !== 'string') return null;
   if (isProcess(value)) return value;
+  const status = normalizeProcessStatus(value.status);
+  if (
+    status &&
+    typeof value.date === 'string' &&
+    typeof value.name === 'string' &&
+    typeof value.createdAt === 'string' &&
+    typeof value.updatedAt === 'string'
+  ) {
+    return {
+      id: value.id,
+      date: value.date,
+      name: value.name,
+      identification: typeof value.identification === 'string' ? value.identification : undefined,
+      phone: typeof value.phone === 'string' ? value.phone : undefined,
+      status,
+      originalStatusSymbol: typeof value.originalStatusSymbol === 'string' ? value.originalStatusSymbol : undefined,
+      notes: typeof value.notes === 'string' ? value.notes : undefined,
+      createdAt: value.createdAt,
+      updatedAt: value.updatedAt,
+    };
+  }
   if (typeof value.title !== 'string' || !Array.isArray(value.fields)) return null;
 
   const fields = value.fields.filter(isRecord);

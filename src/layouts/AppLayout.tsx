@@ -1,5 +1,5 @@
 // layouts/AppLayout.tsx
-import { MonitorCog, Moon, Sun } from 'lucide-react';
+import { AlertTriangle, MonitorCog, Moon, Sun } from 'lucide-react';
 import { useEffect, useRef, useState, type ComponentType, type PropsWithChildren } from 'react';
 import type { ThemePreference } from '../hooks/useTheme';
 
@@ -7,6 +7,7 @@ interface AppLayoutProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
   onThemePreferenceChange: (theme: ThemePreference) => void;
+  oldProcessesWarningCount: number;
   storageError?: string;
   themePreference: ThemePreference;
 }
@@ -31,6 +32,7 @@ export function AppLayout({
   activeSection,
   onSectionChange,
   onThemePreferenceChange,
+  oldProcessesWarningCount,
   storageError,
   themePreference,
   children,
@@ -91,16 +93,23 @@ export function AppLayout({
               {sections.map((section) => (
                 <button
                   aria-current={activeSection === section.id ? 'page' : undefined}
-                  className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors ${
+                  className={`relative rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors ${
                     activeSection === section.id
                       ? 'bg-[var(--color-primary)] text-white shadow-[0_8px_18px_rgba(91,124,250,0.18)]'
                       : 'text-[var(--color-muted)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]'
                   }`}
+                  title={section.id === 'data' && oldProcessesWarningCount > 0 ? `${oldProcessesWarningCount} procesos antiguos requieren revision` : section.label}
                   key={section.id}
                   onClick={() => onSectionChange(section.id)}
                   type="button"
                 >
                   {section.label}
+                  {section.id === 'data' && oldProcessesWarningCount > 0 ? (
+                    <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center gap-1 rounded-full border border-red-300 bg-red-100 px-1.5 text-[0.68rem] font-black leading-none text-red-800 shadow-sm dark:border-red-700 dark:bg-red-900 dark:text-red-100">
+                      <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                      {oldProcessesWarningCount > 99 ? '99+' : oldProcessesWarningCount}
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </nav>

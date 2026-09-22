@@ -78,6 +78,28 @@ describe('parseProcessesText', () => {
     expect(result[0].process.status).toBe('pending');
   });
 
+  it('recognizes COMPLETO - NO APTO as a valid pasted status', () => {
+    const result = parseProcessesText('PERSONA NO APTA  1000000000  3000000000 COMPLETO - NO APTO', []);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].process.name).toBe('PERSONA NO APTA');
+    expect(result[0].process.status).toBe('COMPLETO - NO APTO');
+    expect(result[0].warnings).not.toContain('Estado no reconocido');
+  });
+
+  it('maps previous no apto wordings to the current status', () => {
+    const result = parseProcessesText(
+      [
+        'PERSONA LEGADA  1000000000  3000000000 OK completo - NO APTO',
+        'PERSONA MIXTA  1000000001  3000000001 Completo - NO APTO',
+      ].join('\n'),
+      [],
+    );
+
+    expect(result).toHaveLength(2);
+    expect(result.map((item) => item.process.status)).toEqual(['COMPLETO - NO APTO', 'COMPLETO - NO APTO']);
+  });
+
   it('keeps unknown final words as warnings instead of guessing a status', () => {
     const result = parseProcessesText('PERSONA RARA  1000000000  3000000000 revision', []);
 
